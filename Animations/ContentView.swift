@@ -1,21 +1,19 @@
-//
-//  ContentView.swift
-//  Animations
-//
-//  Created by Leo Chung on 12/11/23.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @State private var animationAmount = 1.0
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Button("Tap Me") {
+            animationAmount += 1
         }
-        .padding()
+        .padding(50)
+        .background(.red)
+        .foregroundStyle(.white)
+        .clipShape(.circle)
+        .scaleEffect(animationAmount)
+        .animation(.default, value: animationAmount)
+        .blur(radius: (animationAmount - 1) * 3)
     }
 }
 
