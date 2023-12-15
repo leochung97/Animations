@@ -5,6 +5,26 @@ import SwiftUI
 // When you use attach an animation() as a modifier (i.e., $animationAmount.animation()) -> you don't have to specify which value we're watching for changes as it is attached to the value it should watch
 // You can apply an animation() modifier to a view in order to have it implicitly animate changes
 
+struct CornerRotateModifier: ViewModifier {
+    let amount: Double
+    let anchor: UnitPoint
+
+    func body(content: Content) -> some View {
+        content
+            .rotationEffect(.degrees(amount), anchor: anchor)
+            .clipped()
+    }
+}
+
+extension AnyTransition {
+    static var pivot: AnyTransition {
+        .modifier(
+            active: CornerRotateModifier(amount: -90, anchor: .topLeading),
+            identity: CornerRotateModifier(amount: 0, anchor: .topLeading)
+        )
+    }
+}
+
 struct ContentView: View {
     @State private var animationAmount = 0.0
     let letters = Array("Hello SwiftUI")
@@ -14,6 +34,24 @@ struct ContentView: View {
     @State private var isShowingRed = false
 
     var body: some View {
+        ZStack {
+            Rectangle()
+                .fill(.blue)
+                .frame(width: 200, height: 200)
+            
+            if isShowingRed {
+                Rectangle()
+                    .fill(.red)
+                    .frame(width: 200, height: 200)
+                    .transition(.pivot)
+            }
+        }
+        .onTapGesture {
+            withAnimation {
+                isShowingRed.toggle()
+            }
+        }
+        
         HStack(spacing: 0) {
             ForEach(0..<letters.count, id: \.self) { num in
                 Text(String(letters[num]))
