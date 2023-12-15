@@ -7,18 +7,58 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var animationAmount = 0.0
+    let letters = Array("Hello SwiftUI")
     @State private var enabled = false
+    @State private var dragAmount = CGSize.zero
     
+    @State private var isShowingRed = false
+
     var body: some View {
-        Button("Tap Me") {
-            enabled.toggle()
+        HStack(spacing: 0) {
+            ForEach(0..<letters.count, id: \.self) { num in
+                Text(String(letters[num]))
+                    .padding(5)
+                    .font(.title)
+                    .background(enabled ? .blue : .red)
+                    .offset(dragAmount)
+                    .animation(.linear.delay(Double(num) / 20), value: dragAmount)
+            }
         }
-        .frame(width: 200, height: 200)
-        .background(enabled ? .blue : .red)
-        .animation(nil, value: enabled)
-        .foregroundStyle(.white)
-        .clipShape(.rect(cornerRadius: enabled ? 60 : 0))
-        .animation(.spring(duration: 1, bounce: 0.6), value: enabled)
+        .gesture(
+            DragGesture()
+                .onChanged { dragAmount = $0.translation }
+                .onEnded { _ in
+                    dragAmount = .zero
+                    enabled.toggle()
+                }
+        )
+        
+        VStack {
+            Button("Tap Me") {
+                withAnimation {
+                    isShowingRed.toggle()
+                }
+            }
+
+            if isShowingRed {
+                Rectangle()
+                    .fill(.red)
+                    .frame(width: 200, height: 200)
+                    .transition(.asymmetric(insertion: .scale, removal: .opacity))
+            }
+        }
+    }
+            // .animation(.bouncy, value: dragAmount)
+        
+        //        Button("Tap Me") {
+//            enabled.toggle()
+//        }
+//        .frame(width: 200, height: 200)
+//        .background(enabled ? .blue : .red)
+//        .animation(nil, value: enabled)
+//        .foregroundStyle(.white)
+//        .clipShape(.rect(cornerRadius: enabled ? 60 : 0))
+//        .animation(.spring(duration: 1, bounce: 0.6), value: enabled)
         // .rotation3DEffect(.degrees(animationAmount), axis: (x: 1, y: 0, z: 0))
         
 //        return VStack {
@@ -72,7 +112,6 @@ struct ContentView: View {
                 // .repeatForever(autoreverses: true)
             // , value: animationAmount)
         // .blur(radius: (animationAmount - 1) * 3)
-    }
 }
 
 #Preview {
